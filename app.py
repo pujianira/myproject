@@ -162,3 +162,13 @@ st.write(df[['cluster', 'cluster_label']].drop_duplicates().sort_values('cluster
 st.write("### Visualisasi Hasil Clustering dengan Label Interpretasi")
 pairplot_fig = sns.pairplot(df, hue='cluster_label', vars=variables, palette='Set2')
 st.pyplot(pairplot_fig)
+
+if submit_prediction:
+    new_data = np.array([input_data])
+    if new_data.shape[1] == model.n_features_in_:
+        predicted_cluster = model.predict(new_data)
+        predicted_label = cluster_labels.get(predicted_cluster[0], "Unknown")
+        st.subheader("Hasil Prediksi:")
+        st.write(f"Data baru masuk ke cluster: *{predicted_cluster[0]}* dengan label: *{predicted_label}*")
+    else:
+        st.error(f"Jumlah fitur tidak sesuai. Model ini mengharapkan {model.n_features_in_} fitur, tetapi input memiliki {new_data.shape[1]} fitur.")
