@@ -31,7 +31,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
-# import nltk
+import nltk
 from nltk.tokenize import word_tokenize
 from sklearn.metrics import silhouette_score
 import re
