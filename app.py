@@ -11,13 +11,10 @@ from sklearn.metrics import silhouette_score, davies_bouldin_score, calinski_har
 from sklearn.ensemble import RandomForestClassifier
 import joblib
 import io
-import plotly.express as px
-import plotly.graph_objects as go
 from scipy import stats
 
-# Konfigurasi Streamlit
-st.set_page_config(page_title="Advanced Customer Segmentation", layout="wide")
-st.title("Advanced Customer Behavior Segmentation Analysis")
+# Set style for better visualization
+plt.style.use('seaborn')
 
 # Utility Functions
 def remove_outliers(df, columns, method='zscore', threshold=3):
@@ -38,63 +35,20 @@ def remove_outliers(df, columns, method='zscore', threshold=3):
                 (df_clean[column] >= Q1 - threshold * IQR) & 
                 (df_clean[column] <= Q3 + threshold * IQR)
             ]
-    
     return df_clean
-
-def plot_distribution(df, column):
-    """
-    Create distribution plot using plotly
-    """
-    fig = go.Figure()
-    fig.add_trace(go.Histogram(x=df[column], nbinsx=30, name='Histogram'))
-    fig.add_trace(go.Violin(x=df[column], name='Violin Plot', side='positive'))
-    
-    fig.update_layout(
-        title=f'Distribution of {column}',
-        xaxis_title=column,
-        yaxis_title='Count',
-        showlegend=True
-    )
-    
-    return fig
-
-def create_correlation_heatmap(df, cols):
-    """
-    Create correlation heatmap using plotly
-    """
-    corr_matrix = df[cols].corr()
-    
-    fig = go.Figure(data=go.Heatmap(
-        z=corr_matrix.values,
-        x=corr_matrix.columns,
-        y=corr_matrix.columns,
-        colorscale='RdBu',
-        zmin=-1, zmax=1,
-        text=np.round(corr_matrix.values, 2),
-        texttemplate='%{text}',
-        textfont={"size": 10},
-        hoverongaps=False
-    ))
-    
-    fig.update_layout(
-        title='Correlation Heatmap',
-        width=800,
-        height=800
-    )
-    
-    return fig
 
 # Load Data
 try:
     df = pd.read_csv("Customer Purchase Data.csv")
     
     # ============= EXPLORATORY DATA ANALYSIS =============
+    st.title("Advanced Customer Segmentation Analysis")
     st.header("1. Exploratory Data Analysis (EDA)")
     
     # 1.1 Dataset Overview
     st.subheader("1.1 Dataset Overview")
     st.write("Shape of dataset:", df.shape)
-    st.write("### First 5 rows of dataset")
+    st.write("First 5 rows of dataset:")
     st.write(df.head())
     
     # 1.2 Data Info and Missing Values
@@ -107,11 +61,9 @@ try:
         st.text(buffer.getvalue())
     
     with col2:
-        missing_values = df.isnull().sum()
-        missing_percent = (missing_values / len(df)) * 100
         missing_df = pd.DataFrame({
-            'Missing Values': missing_values,
-            'Percentage': missing_percent
+            'Missing Values': df.isnull().sum(),
+            'Percentage': (df.isnull().sum() / len(df) * 100)
         })
         st.write("Missing Values Analysis:")
         st.write(missing_df)
@@ -120,62 +72,58 @@ try:
     st.subheader("1.3 Statistical Summary")
     st.write(df.describe())
     
-    # 1.4 Advanced Distribution Analysis
-    st.subheader("1.4 Advanced Distribution Analysis")
+    # 1.4 Distribution Analysis
+    st.subheader("1.4 Distribution Analysis")
     numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns
     
     for col in numerical_cols:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 5))
+        
+        # Histogram with KDE
+        sns.histplot(data=df, x=col, kde=True, ax=ax1)
+        ax1.set_title(f'Distribution of {col}')
+        
+        # Box Plot
+        sns.boxplot(y=df[col], ax=ax2)
+        ax2.set_title(f'Box Plot of {col}')
+        
+        st.pyplot(fig)
+        plt.close()
+        
         # Distribution statistics
-        skewness = stats.skew(df[col])
-        kurtosis = stats.kurtosis(df[col])
-        
-        st.write(f"### Distribution Analysis for {col}")
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.plotly_chart(plot_distribution(df, col), use_container_width=True)
-        
-        with col2:
-            stats_df = pd.DataFrame({
-                'Metric': ['Mean', 'Median', 'Std Dev', 'Skewness', 'Kurtosis'],
-                'Value': [
-                    df[col].mean(),
-                    df[col].median(),
-                    df[col].std(),
-                    skewness,
-                    kurtosis
-                ]
-            })
-            st.write("Distribution Statistics:")
-            st.write(stats_df)
-            
-            # Normality test
-            stat, p_value = stats.normaltest(df[col])
-            st.write(f"Normality Test (D'Agostino's K^2):")
-            st.write(f"p-value: {p_value:.4f}")
-            if p_value < 0.05:
-                st.write("Distribution is not normal (p < 0.05)")
-            else:
-                st.write("Distribution appears normal (p >= 0.05)")
+        stats_df = pd.DataFrame({
+            'Metric': ['Mean', 'Median', 'Std Dev', 'Skewness', 'Kurtosis'],
+            'Value': [
+                df[col].mean(),
+                df[col].median(),
+                df[col].std(),
+                stats.skew(df[col]),
+                stats.kurtosis(df[col])
+            ]
+        })
+        st.write(f"Statistics for {col}:")
+        st.write(stats_df)
     
     # 1.5 Correlation Analysis
-    st.subheader("1.5 Advanced Correlation Analysis")
-    st.plotly_chart(create_correlation_heatmap(df, numerical_cols))
+    st.subheader("1.5 Correlation Analysis")
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(df[numerical_cols].corr(), annot=True, cmap='coolwarm', ax=ax)
+    plt.title('Correlation Heatmap')
+    st.pyplot(fig)
+    plt.close()
     
     # ============= FEATURE SELECTION & PREPROCESSING =============
-    st.header("2. Feature Selection & Advanced Preprocessing")
+    st.header("2. Feature Selection & Preprocessing")
     
     # 2.1 Feature Selection
-    st.subheader("2.1 Feature Selection")
     variables = st.multiselect(
         "Select Variables for Clustering:",
         numerical_cols,
-        default=['Income', 'Spending_Score', 'Membership_Years'],
-        help="Choose features that best represent customer behavior"
+        default=['Income', 'Spending_Score', 'Membership_Years']
     )
     
     if len(variables) >= 2:
-        # 2.2 Outlier Handling
+        # 2.2 Outlier Treatment
         st.subheader("2.2 Outlier Treatment")
         outlier_method = st.selectbox(
             "Select Outlier Detection Method:",
@@ -217,11 +165,11 @@ try:
             st.write("After Scaling:")
             st.write(df_scaled.describe())
         
-        # 2.4 Dimensionality Reduction
+        # 2.4 PCA
         st.subheader("2.4 Dimensionality Reduction")
         use_pca = st.checkbox("Apply PCA", value=False)
         
-        if use_pca:
+        if use_pca and len(variables) > 2:
             n_components = st.slider(
                 "Select number of components:",
                 min_value=2,
@@ -233,39 +181,26 @@ try:
             df_pca = pca.fit_transform(df_scaled)
             
             # Show explained variance
+            fig, ax = plt.subplots(figsize=(10, 6))
             explained_variance = pca.explained_variance_ratio_
-            cumulative_variance = np.cumsum(explained_variance)
+            ax.bar(range(1, len(explained_variance) + 1), explained_variance)
+            ax.plot(range(1, len(explained_variance) + 1), 
+                   np.cumsum(explained_variance), 
+                   'r-o')
+            ax.set_xlabel('Principal Components')
+            ax.set_ylabel('Explained Variance Ratio')
+            plt.title('PCA Explained Variance')
+            st.pyplot(fig)
+            plt.close()
             
-            fig = go.Figure()
-            fig.add_trace(go.Bar(
-                x=list(range(1, len(explained_variance) + 1)),
-                y=explained_variance,
-                name='Individual'
-            ))
-            fig.add_trace(go.Scatter(
-                x=list(range(1, len(cumulative_variance) + 1)),
-                y=cumulative_variance,
-                name='Cumulative'
-            ))
-            
-            fig.update_layout(
-                title='PCA Explained Variance',
-                xaxis_title='Principal Component',
-                yaxis_title='Explained Variance Ratio'
-            )
-            
-            st.plotly_chart(fig)
-            
-            # Use PCA results for clustering
             clustering_data = df_pca
         else:
             clustering_data = df_scaled
         
         # ============= CLUSTERING ANALYSIS =============
-        st.header("3. Advanced Clustering Analysis")
+        st.header("3. Clustering Analysis")
         
-        # 3.1 Algorithm Selection
-        st.subheader("3.1 Clustering Algorithm Selection")
+        # Algorithm Selection
         clustering_algo = st.selectbox(
             "Select Clustering Algorithm",
             ["KMeans", "GaussianMixture", "DBSCAN"]
@@ -275,10 +210,15 @@ try:
             # Elbow Method and Silhouette Analysis
             max_clusters = st.slider("Maximum number of clusters to try:", 2, 15, 10)
             
-            inertias = []
-            silhouette_scores = []
-            davies_bouldin_scores = []
-            calinski_harabasz_scores = []
+            metrics = {
+                'n_clusters': list(range(2, max_clusters + 1)),
+                'silhouette': [],
+                'davies_bouldin': [],
+                'calinski_harabasz': []
+            }
+            
+            if clustering_algo == "KMeans":
+                metrics['inertia'] = []
             
             for k in range(2, max_clusters + 1):
                 if clustering_algo == "KMeans":
@@ -288,48 +228,41 @@ try:
                 
                 labels = model.fit_predict(clustering_data)
                 
-                if hasattr(model, 'inertia_'):
-                    inertias.append(model.inertia_)
-                
-                silhouette_scores.append(silhouette_score(clustering_data, labels))
-                davies_bouldin_scores.append(davies_bouldin_score(clustering_data, labels))
-                calinski_harabasz_scores.append(calinski_harabasz_score(clustering_data, labels))
+                if clustering_algo == "KMeans":
+                    metrics['inertia'].append(model.inertia_)
+                    
+                metrics['silhouette'].append(silhouette_score(clustering_data, labels))
+                metrics['davies_bouldin'].append(davies_bouldin_score(clustering_data, labels))
+                metrics['calinski_harabasz'].append(calinski_harabasz_score(clustering_data, labels))
             
             # Plot metrics
-            fig = go.Figure()
+            fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+            fig.suptitle('Clustering Metrics')
             
-            if inertias:
-                fig.add_trace(go.Scatter(
-                    x=list(range(2, max_clusters + 1)),
-                    y=inertias,
-                    name='Inertia'
-                ))
+            if clustering_algo == "KMeans":
+                axes[0, 0].plot(metrics['n_clusters'], metrics['inertia'], 'bo-')
+                axes[0, 0].set_title('Elbow Method')
+                axes[0, 0].set_xlabel('Number of Clusters')
+                axes[0, 0].set_ylabel('Inertia')
             
-            fig.add_trace(go.Scatter(
-                x=list(range(2, max_clusters + 1)),
-                y=silhouette_scores,
-                name='Silhouette Score'
-            ))
+            axes[0, 1].plot(metrics['n_clusters'], metrics['silhouette'], 'ro-')
+            axes[0, 1].set_title('Silhouette Score')
+            axes[0, 1].set_xlabel('Number of Clusters')
+            axes[0, 1].set_ylabel('Score')
             
-            fig.add_trace(go.Scatter(
-                x=list(range(2, max_clusters + 1)),
-                y=davies_bouldin_scores,
-                name='Davies-Bouldin Score'
-            ))
+            axes[1, 0].plot(metrics['n_clusters'], metrics['davies_bouldin'], 'go-')
+            axes[1, 0].set_title('Davies-Bouldin Score')
+            axes[1, 0].set_xlabel('Number of Clusters')
+            axes[1, 0].set_ylabel('Score')
             
-            fig.add_trace(go.Scatter(
-                x=list(range(2, max_clusters + 1)),
-                y=calinski_harabasz_scores,
-                name='Calinski-Harabasz Score'
-            ))
+            axes[1, 1].plot(metrics['n_clusters'], metrics['calinski_harabasz'], 'mo-')
+            axes[1, 1].set_title('Calinski-Harabasz Score')
+            axes[1, 1].set_xlabel('Number of Clusters')
+            axes[1, 1].set_ylabel('Score')
             
-            fig.update_layout(
-                title='Clustering Metrics by Number of Clusters',
-                xaxis_title='Number of Clusters',
-                yaxis_title='Score'
-            )
-            
-            st.plotly_chart(fig)
+            plt.tight_layout()
+            st.pyplot(fig)
+            plt.close()
             
             # Select optimal number of clusters
             optimal_k = st.slider(
@@ -356,23 +289,20 @@ try:
             min_samples = st.slider("Select min_samples:", 2, 10, 5)
             final_model = DBSCAN(eps=eps, min_samples=min_samples)
         
-        # Fit final model
+        # Fit final model and get labels
         labels = final_model.fit_predict(clustering_data)
-        
-        # Add cluster labels to original data
         df_cleaned['Cluster'] = labels
         
         # ============= CLUSTER ANALYSIS & VISUALIZATION =============
         st.header("4. Cluster Analysis & Visualization")
         
         # 4.1 Cluster Statistics
-        st.subheader("4.1 Detailed Cluster Statistics")
+        st.subheader("4.1 Cluster Statistics")
         for cluster in sorted(set(labels)):
             st.write(f"### Cluster {cluster}")
             cluster_data = df_cleaned[df_cleaned['Cluster'] == cluster]
             
             col1, col2 = st.columns(2)
-            
             with col1:
                 st.write("Size:", len(cluster_data))
                 st.write("Percentage:", f"{(len(cluster_data) / len(df_cleaned) * 100):.2f}%")
@@ -391,19 +321,42 @@ try:
             'importance': rf.feature_importances_
         }).sort_values('importance', ascending=False)
         
-        fig = px.bar(
-            feature_importance,
-            x='importance',
-            y='feature',
-            title='Feature Importance for Clustering'
-        )
-        st.plotly_chart(fig)
+        fig, ax = plt.subplots(figsize=(10, 6))
+        sns.barplot(data=feature_importance, x='importance', y='feature', ax=ax)
+        plt.title('Feature Importance for Clustering')
+        st.pyplot(fig)
+        plt.close()
         
-        # 4.3 Interactive Cluster Visualization
-        st.subheader("4.3 Interactive Cluster Visualization")
+        # 4.3 Cluster Visualization
+        st.subheader("4.3 Cluster Visualization")
         
         if len(variables) >= 2:
             x_var = st.selectbox("Select X variable:", variables)
             y_var = st.selectbox("Select Y variable:", variables, index=1)
-finally:
-    print("Always executed regardless of error.")
+            
+            fig, ax = plt.subplots(figsize=(10, 6))
+            scatter = ax.scatter(df_cleaned[x_var], 
+                               df_cleaned[y_var], 
+                               c=labels, 
+                               cmap='viridis')
+            plt.colorbar(scatter)
+            ax.set_xlabel(x_var)
+            ax.set_ylabel(y_var)
+            plt.title('Cluster Visualization')
+            st.pyplot(fig)
+            plt.close()
+        
+        # Save model if requested
+        if st.button("Save Model"):
+            model_data = {
+                'model': final_model,
+                'scaler': scaler,
+                'variables': variables,
+                'pca': pca if use_pca else None
+            }
+            joblib.dump(model_data, 'customer_segmentation_model.pkl')
+            st.success("Model saved successfully!")
+
+except Exception as e:
+    st.error(f"An error occurred: {str(e)}")
+    st.write("Please ensure your dataset contains the required columns and is properly formatted.")
