@@ -47,35 +47,33 @@ import re
 # uploaded = files.upload()
 
 df = pd.read_csv('Customer Purchase Data.csv')
-print(df.size)
+st.write(df.head())
 
 """**b. Lima baris awal dari dataset**"""
 
-df.head()
-
 """**c. Eksplorasi baris & kolom, tipe data**"""
 
-df.info()
+st.write(df.info())
 
 """**d. Eksplorasi missing values**"""
 
-df.isnull().sum()
+st.write(df.isnull().sum())
 
 """**e. Eksplorasi data duplikat**"""
 
-print(f"Jumlah duplikasi: {df.duplicated().sum()}")
+st.write((f"Jumlah duplikasi: {df.duplicated().sum()}"))
 df = df.drop_duplicates()
 
 """**f. Statistik deskriptif dataset**"""
 
-df.describe()
+st.wirte(df.describe())
 
 """**g. Penghapusan kolom 'Number'**"""
 
 #Drop kolom number
 df.drop(["Number"], axis=1, inplace=True)
 
-print(df.columns)
+st.write(df.columns)
 
 """# **2. Visualisasi Distribusi Variabel Numerik**
 
