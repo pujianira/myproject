@@ -24,7 +24,7 @@ Dengan menggunakan dataset yang ada, kami menganalisis data dari berbagai kriter
 
 # 📚 **Library yang Diperlukan**
 """
-
+import streamlit as st
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
