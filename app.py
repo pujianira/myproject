@@ -26,11 +26,13 @@ Dengan menggunakan dataset yang ada, kami menganalisis data dari berbagai kriter
 """
 import streamlit as st
 import pandas as pd
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
+import seaborn as sns
 import nltk
 from nltk.tokenize import word_tokenize
 from sklearn.metrics import silhouette_score
