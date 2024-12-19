@@ -357,7 +357,6 @@ for i, row in components_df.iterrows():
 
 **a. Elbow Method**
 """
-
 # Mencari jumlah cluster optimal dengan Elbow Method
 inertia = []
 k_values = range(2, 10)
@@ -368,13 +367,19 @@ for k in k_values:
     inertia.append(kmeans.inertia_)
 
 # Visualisasi Elbow Curve
+st.subheader('Elbow Method untuk Menentukan Jumlah Cluster Optimal')
+
 fig, ax = plt.subplots(figsize=(10, 6))
 sns.lineplot(x=k_values, y=inertia, marker='o', ax=ax)
 ax.set_title('Elbow Method for Optimal k')
 ax.set_xlabel('Number of Clusters (k)')
 ax.set_ylabel('Inertia')
-ax.grid()
+ax.set_xticks(k_values)
+ax.grid(True)
+
+# Menampilkan plot di Streamlit
 st.pyplot(fig)
+
 
 """**Analisis:**
 
@@ -388,23 +393,30 @@ Penurunan inertia setelah k=3 menjadi lebih kecil, sehingga k=3 dapat dianggap t
 **b. Silhouette Score**
 """
 
-# Menghitung Silhouette Score untuk berbagai jumlah cluster
+# Daftar jumlah cluster yang diuji
+k_values = range(2, 11)  # Misalnya 2 sampai 10 cluster
+
+# Menghitung Silhouette Score untuk setiap jumlah cluster
 silhouette_scores = []
 
 for k in k_values:
     kmeans = KMeans(n_clusters=k, random_state=42)
-    kmeans.fit(df_scaled)
-    cluster_labels = kmeans.labels_
+    cluster_labels = kmeans.fit_predict(df_scaled)
     silhouette_avg = silhouette_score(df_scaled, cluster_labels)
     silhouette_scores.append(silhouette_avg)
 
 # Visualisasi Silhouette Scores
+st.subheader('Silhouette Score untuk Menentukan Jumlah Cluster Optimal')
+
 fig, ax = plt.subplots(figsize=(10, 6))
-sns.lineplot(x=k_values, y=silhouette_scores, marker='o', ax=ax)
-ax.set_title('Silhouette Scores for Different Numbers of Clusters')
+sns.lineplot(x=k_values, y=silhouette_scores, marker='o', color='blue', ax=ax)
+ax.set_title('Silhouette Score for Optimal k')
 ax.set_xlabel('Number of Clusters (k)')
 ax.set_ylabel('Silhouette Score')
-ax.grid()
+ax.set_xticks(k_values)
+ax.grid(True)
+
+# Menampilkan plot di Streamlit
 st.pyplot(fig)
 
 # Menentukan k optimal
