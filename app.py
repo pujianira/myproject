@@ -488,7 +488,7 @@ st.pyplot(fig)
 
 Kelompok ini memerlukan insentif yang lebih kecil namun menarik, seperti diskon atau promosi untuk mendorong frekuensi pembelian mereka. Perusahaan dapat fokus pada peningkatan pengalaman berbelanja agar pelanggan ini lebih sering membeli.
 
-## 🎲 **3. Cluster 3: Pelanggan Platinum**
+## 🎲 **4. Cluster 3: Pelanggan Platinum**
 
 * Rata-rata Usia: 57.14 tahun
 * Rata-rata Pendapatan: 62,490.30
@@ -507,7 +507,7 @@ Kelompok ini memerlukan insentif yang lebih kecil namun menarik, seperti diskon 
 * Buat promosi untuk menjaga mereka tetap loyal, meski masa keanggotaan mereka cenderung lebih singkat.
 * Memberikan program langganan bulanan.
 
-## 🎲 **4. Cluster 4: Pelanggan Silver**
+## 🎲 **5. Cluster 4: Pelanggan Silver**
 
 * Rata-rata Usia: 36.14 tahun
 * Rata-rata Pendapatan: 41,057.98
