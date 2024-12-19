@@ -423,11 +423,6 @@ k=3 adalah pilihan yang lebih baik karena memiliki keseimbangan antara penurunan
 # 🖥️**7. K-Means Clustering & Visualisasi**👩‍💻
 """
 
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-import seaborn as sns
-
 # Jumlah cluster yang ditentukan
 optimal_k = 3
 st.write(f"Jumlah cluster optimal: {optimal_k}")
@@ -460,57 +455,7 @@ ax.set_xlabel('Economical Factors')
 ax.set_ylabel('Behavioral Factors')
 ax.legend(title='Cluster')
 ax.grid()
-
-# Menampilkan plot di Streamlit
 st.pyplot(fig)
-
-# 5.2 Prediction Interface
-st.subheader("5.2 Predict New Customer Behavior")
-
-# Form untuk input data baru
-with st.form("prediction_form"):
-    st.write("Enter New Customer Data:")
-    input_data = {}
-    
-    # Menampilkan input untuk setiap variabel
-    variables = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Purchase_Frequency', 'Last_Purchase_Amount']
-    for var in variables:
-        input_data[var] = st.number_input(
-            f"Enter {var}:",
-            value=float(df[var].mean()),  # Nilai default berdasarkan rata-rata
-            help=f"Average value: {df[var].mean():.2f}"  # Menampilkan bantuan nilai rata-rata
-        )
-    
-    # Tombol untuk mengirim form
-    submit_button = st.form_submit_button("Predict Behavior")
-
-    cluster_behaviors = {
-    0: "Pelanggan dengan Pengeluaran Biasa",
-    1: "Pelanggan dengan Pengeluaran Tinggi",
-    2: "Pelanggan dengan Pengeluaran Hemat"
-}
-    
-    if submit_button:
-        # Mempersiapkan data input dan melakukan scaling
-        input_df = pd.DataFrame([input_data])
-        input_scaled = scaler.transform(input_df)  # Skalakan data input menggunakan scaler yang sudah dilatih
-        
-        # Prediksi cluster
-        cluster = kmeans.predict(input_scaled)[0]  # Prediksi cluster untuk data input
-        behavior = cluster_behaviors.get(cluster, "Unknown")  # Menentukan perilaku berdasarkan cluster
-        
-        # Menampilkan hasil prediksi
-        st.success(f"Customer Segment: {behavior} (Cluster {cluster})")
-        
-        # Membandingkan dengan rata-rata cluster
-        st.write("#### Comparison with Cluster Averages")
-        comparison_df = pd.DataFrame({
-            'Input Values': input_data,
-            'Cluster Average': df[df['Cluster'] == cluster][variables].mean()
-        }).round(2)
-        
-        st.write(comparison_df)
-
 
 """# 🛒**8.Analisis Clustering Berdasarkan Spending Behavior**🕵️‍♀️
 
@@ -589,3 +534,50 @@ Rata-rata Jumlah Pembelian Terakhir: 4,766.68
 
 Kelompok ini memerlukan insentif yang lebih kecil namun menarik, seperti diskon atau promosi untuk mendorong frekuensi pembelian mereka. Perusahaan dapat fokus pada peningkatan pengalaman berbelanja agar pelanggan ini lebih sering membeli.
 """
+# Prediction Interface
+st.subheader("5.2 Predict New Customer Behavior")
+
+# Form untuk input data baru
+with st.form("prediction_form"):
+    st.write("Enter New Customer Data:")
+    input_data = {}
+    
+    # Menampilkan input untuk setiap variabel
+    variables = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Purchase_Frequency', 'Last_Purchase_Amount']
+    for var in variables:
+        input_data[var] = st.number_input(
+            f"Enter {var}:",
+            value=float(df[var].mean()),  # Nilai default berdasarkan rata-rata
+            help=f"Average value: {df[var].mean():.2f}"  # Menampilkan bantuan nilai rata-rata
+        )
+    
+    # Tombol untuk mengirim form
+    submit_button = st.form_submit_button("Predict Behavior")
+
+    cluster_behaviors = {
+    0: "Pelanggan dengan Pengeluaran Biasa",
+    1: "Pelanggan dengan Pengeluaran Tinggi",
+    2: "Pelanggan dengan Pengeluaran Hemat"
+}
+    
+    if submit_button:
+        # Mempersiapkan data input dan melakukan scaling
+        input_df = pd.DataFrame([input_data])
+        input_scaled = scaler.transform(input_df)  # Skalakan data input menggunakan scaler yang sudah dilatih
+        
+        # Prediksi cluster
+        cluster = kmeans.predict(input_scaled)[0]  # Prediksi cluster untuk data input
+        behavior = cluster_behaviors.get(cluster, "Unknown")  # Menentukan perilaku berdasarkan cluster
+        
+        # Menampilkan hasil prediksi
+        st.success(f"Customer Segment: {behavior} (Cluster {cluster})")
+        
+        # Membandingkan dengan rata-rata cluster
+        st.write("#### Comparison with Cluster Averages")
+        comparison_df = pd.DataFrame({
+            'Input Values': input_data,
+            'Cluster Average': df[df['Cluster'] == cluster][variables].mean()
+        }).round(2)
+        
+        st.write(comparison_df)
+
