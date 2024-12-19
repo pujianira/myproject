@@ -12,7 +12,7 @@ st.markdown("""
 4️⃣ Nabila Betari Anjani - 24060122140169
 
 # ‼️**Identifikasi Masalah**⁉️
-Sebuah perusahaan retail menyadari bahwa pelanggan mereka memiliki kebiasaan belanja yang beragam, sehingga perlu membuat strategi pemasaran yang lebih spesifik menyasar pelanggan dengan masing-masing kebiasan mereka. Perusahaan ingin membagi pelanggannya menjadi tiga kategori, yaitu **pelanggan hemat, pelanggan biasa, dan pelanggan dengan pengeluaran tinggi.** Masing-masing kategori nantinya akan diberikan strategi pemasaran yang sesuai.
+Sebuah perusahaan retail menyadari bahwa pelanggan mereka memiliki kebiasaan belanja yang beragam, sehingga perlu membuat strategi pemasaran yang lebih spesifik menyasar pelanggan dengan masing-masing kebiasan mereka. 
 
 Dengan menggunakan dataset yang ada, kami menganalisis data dari berbagai kriteria, seperti usia dan pendapatan pelanggan, skor pengeluaran mereka, keanggotaan mereka, frekuensi pembelian dan jumlah pembelian terakhir mereka untuk menentukan clustering menjadi tiga kategori pelanggan.          
 """)
