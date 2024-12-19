@@ -215,7 +215,6 @@ group_table
 
 **a. Outlier handling**
 """
-
 # 2. Outlier Detection dan Handling menggunakan IQR method
 def handle_outliers(df, column):
     Q1 = df[column].quantile(0.25)
@@ -233,18 +232,20 @@ def handle_outliers(df, column):
 numerical_columns = ['Age', 'Income', 'Spending_Score', 'Membership_Years',
                     'Purchase_Frequency', 'Last_Purchase_Amount']
 
+# Outlier handling untuk setiap kolom numerik
 for column in numerical_columns:
     df = handle_outliers(df, column)
 
-df.plot(kind='box',
-                       subplots=True,
-                       layout=(6, 3),  # Ubah layout agar lebih besar dari jumlah fitur
-                       sharex=False,
-                       sharey=False,
-                       figsize=(15, 20))  # Ukuran gambar lebih besar untuk tampilan jelas
+# Visualisasi boxplot setelah handling outlier
+st.subheader('Visualisasi Boxplot setelah Penanganan Outlier')
 
+fig, ax = plt.subplots(figsize=(15, 20))
+df[numerical_columns].plot(kind='box', subplots=True, layout=(6, 3), 
+                            sharex=False, sharey=False, figsize=(15, 20), ax=ax)
 plt.tight_layout()
-plt.show()
+
+# Menampilkan plot di Streamlit
+st.pyplot(fig)
 
 """# 🧩**5. Principal Component Analysis (PCA)**🤖"""
 
