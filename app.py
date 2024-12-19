@@ -78,8 +78,12 @@ st.write(df.columns)
 **a. Visualisasi distribusi data menggunakan histogram**
 """
 
+import streamlit as st
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
 # === Data Cleaning ===
 # Menghapus nilai null
 df_cleaned = df.dropna()
@@ -96,10 +100,13 @@ numerical_columns = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Pur
 # Daftar variabel yang ingin diplot
 variables = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Purchase_Frequency', 'Last_Purchase_Amount']
 
+# **a. Visualisasi distribusi data menggunakan histogram**
+st.subheader("a. Visualisasi distribusi data menggunakan histogram")
+
 # Cek apakah kolom-kolom ada di dalam DataFrame
 for var in variables:
     if var in df.columns:
-        print(f"Menampilkan distribusi untuk kolom: {var}")
+        st.write(f"Menampilkan distribusi untuk kolom: {var}")
 
         # Cek tipe data kolom
         if pd.api.types.is_numeric_dtype(df[var]):
@@ -107,27 +114,31 @@ for var in variables:
             df[var].dropna(inplace=True)
 
             # Membuat plot histogram dengan KDE
-            sns.histplot(df[var], kde=True, bins=30)
-            plt.title(f'Distribusi {var}')
-            plt.show()
+            fig, ax = plt.subplots()
+            sns.histplot(df[var], kde=True, bins=30, ax=ax)
+            ax.set_title(f'Distribusi {var}')
+            st.pyplot(fig)
         else:
-            print(f"Kolom {var} bukan tipe numerik.")
+            st.write(f"Kolom {var} bukan tipe numerik.")
     else:
-        print(f"Kolom {var} tidak ditemukan dalam dataset.")
+        st.write(f"Kolom {var} tidak ditemukan dalam dataset.")
 
-"""**b. Visualisasi distribusi outlier menggunakan boxplot**"""
+# **b. Visualisasi distribusi outlier menggunakan boxplot**
+st.subheader("b. Visualisasi distribusi outlier menggunakan boxplot")
 
+# Boxplot untuk melihat distribusi dan outlier
+fig, ax = plt.subplots(figsize=(15, 20))
 df.plot(kind='box',
-                       subplots=True,
-                       layout=(6, 3),  # Ubah layout agar lebih besar dari jumlah fitur
-                       sharex=False,
-                       sharey=False,
-                       figsize=(15, 20))  # Ukuran gambar lebih besar untuk tampilan jelas
-
+        subplots=True,
+        layout=(6, 3),  # Ubah layout agar lebih besar dari jumlah fitur
+        sharex=False,
+        sharey=False,
+        ax=ax)  # Ukuran gambar lebih besar untuk tampilan jelas
 plt.tight_layout()
-plt.show()
+st.pyplot(fig)
 
-"""**c. Visualisasi matriks korelasi menggunakan heatmap**"""
+# **c. Visualisasi matriks korelasi menggunakan heatmap**
+st.subheader("c. Visualisasi matriks korelasi menggunakan heatmap")
 
 # Scaling data (pastikan semua kolom ada)
 scaler = StandardScaler()
@@ -137,18 +148,19 @@ df_scaled = pd.DataFrame(scaler.fit_transform(df_cleaned[numerical_columns]), co
 correlation_matrix = df_scaled.corr()
 
 # Menampilkan matriks korelasi dengan lebih banyak desimal
-print("=== Matriks Korelasi ===")
-print(correlation_matrix.round(4))  # Membulatkan ke 4 desimal
+st.write("=== Matriks Korelasi ===")
+st.write(correlation_matrix.round(4))  # Membulatkan ke 4 desimal
 
 # Visualisasi dengan lebih banyak desimal
-plt.figure(figsize=(10, 8))
-sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.4f', linewidths=0.5)  # Format 4 desimal
-plt.title('Matriks Korelasi antar Variabel')
-plt.show()
+fig, ax = plt.subplots(figsize=(10, 8))
+sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.4f', linewidths=0.5, ax=ax)  # Format 4 desimal
+ax.set_title('Matriks Korelasi antar Variabel')
+st.pyplot(fig)
 
 # Memeriksa kolom yang hilang
 missing_columns = [col for col in numerical_columns if col not in df_scaled.columns]
-print("Kolom yang hilang:", missing_columns)
+st.write("Kolom yang hilang:", missing_columns)
+
 
 """# **3. Analisis Korelasi Antarfitur dalam Dataset**
 
