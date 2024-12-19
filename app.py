@@ -1,6 +1,6 @@
 import streamlit as st
 st.markdown("""
-# 🤖 **Customer Behavior Segmentation Analysis** 💰
+# **Customer Behavior Segmentation Analysis** 
 
 # 👯‍♀️ **Anggota Kelompok:** 👯‍♀️
 1️⃣ Pujiani Rahayu Agustin - 24060122130067
@@ -32,6 +32,7 @@ import nltk
 from nltk.tokenize import word_tokenize
 from sklearn.metrics import silhouette_score
 import re
+import io
 
 """#  📂**1.Import & Load Dataset**🧩
 
@@ -42,13 +43,15 @@ import re
 # uploaded = files.upload()
 
 df = pd.read_csv('Customer Purchase Data.csv')
-st.write(df.head())
 
 """**b. Lima baris awal dari dataset**"""
-
+st.write(df.head())
 """**c. Eksplorasi baris & kolom, tipe data**"""
 
-st.write(df.info())
+st.subheader("1.2 Data Information")
+buffer = io.StringIO()
+df.info(buf=buffer)
+st.text(buffer.getvalue())
 
 """**d. Eksplorasi missing values**"""
 
@@ -61,7 +64,7 @@ df = df.drop_duplicates()
 
 """**f. Statistik deskriptif dataset**"""
 
-st.wirte(df.describe())
+st.write(df.describe())
 
 """**g. Penghapusan kolom 'Number'**"""
 
