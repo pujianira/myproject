@@ -17,6 +17,17 @@ Sebuah perusahaan retail menyadari bahwa pelanggan mereka memiliki kebiasaan bel
 Dengan menggunakan dataset yang ada, kami menganalisis data dari berbagai kriteria, seperti usia dan pendapatan pelanggan, skor pengeluaran mereka, keanggotaan mereka, frekuensi pembelian dan jumlah pembelian terakhir mereka untuk menentukan clustering menjadi tiga kategori pelanggan.
 
 # 📚 **Library yang Diperlukan**
+import streamlit as st
+import pandas as pd
+import numpy as np
+from sklearn.preprocessing import StandardScaler
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.metrics import silhouette_score
+import io           
 """)
 
 import streamlit as st
@@ -28,72 +39,43 @@ from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import matplotlib.pyplot as plt
 import seaborn as sns
-import nltk
-from nltk.tokenize import word_tokenize
 from sklearn.metrics import silhouette_score
-import re
 import io
 
 """#  📂**1.Import & Load Dataset**🧩
 
 **a. Import dataset**
 """
-
-# from google.colab import files
-# uploaded = files.upload()
-
 df = pd.read_csv('Customer Purchase Data.csv')
 
 """**b. Lima baris awal dari dataset**"""
 st.write(df.head())
-"""**c. Eksplorasi baris & kolom, tipe data**"""
 
-st.subheader("1.2 Data Information")
+"""**c. Eksplorasi baris & kolom, tipe data**"""
 buffer = io.StringIO()
 df.info(buf=buffer)
 st.text(buffer.getvalue())
 
 """**d. Eksplorasi missing values**"""
-
 st.write(df.isnull().sum())
 
 """**e. Eksplorasi data duplikat**"""
-
 st.write((f"Jumlah duplikasi: {df.duplicated().sum()}"))
 df = df.drop_duplicates()
 
 """**f. Statistik deskriptif dataset**"""
-
 st.write(df.describe())
 
 """**g. Penghapusan kolom 'Number'**"""
-
 #Drop kolom number
 df.drop(["Number"], axis=1, inplace=True)
-
 st.write(df.columns)
 
 """# **2. Visualisasi Distribusi Variabel Numerik**
-
 **a. Visualisasi distribusi data menggunakan histogram**
 """
-
-import streamlit as st
-import seaborn as sns
-import matplotlib.pyplot as plt
-import pandas as pd
-from sklearn.preprocessing import StandardScaler
-
-# === Data Cleaning ===
 # Menghapus nilai null
 df_cleaned = df.dropna()
-
-# Drop kolom 'Number' jika ada
-if 'Number' in df_cleaned.columns:
-    df_cleaned.drop(["Number"], axis=1, inplace=True)
-
-# Menghapus duplikasi
-df_cleaned = df_cleaned.drop_duplicates()
 
 # Kolom numerik untuk analisis
 numerical_columns = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Purchase_Frequency', 'Last_Purchase_Amount']
@@ -481,6 +463,54 @@ ax.grid()
 
 # Menampilkan plot di Streamlit
 st.pyplot(fig)
+
+# 5.2 Prediction Interface
+st.subheader("5.2 Predict New Customer Behavior")
+
+# Form untuk input data baru
+with st.form("prediction_form"):
+    st.write("Enter New Customer Data:")
+    input_data = {}
+    
+    # Menampilkan input untuk setiap variabel
+    variables = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Purchase_Frequency', 'Last_Purchase_Amount']
+    for var in variables:
+        input_data[var] = st.number_input(
+            f"Enter {var}:",
+            value=float(df[var].mean()),  # Nilai default berdasarkan rata-rata
+            help=f"Average value: {df[var].mean():.2f}"  # Menampilkan bantuan nilai rata-rata
+        )
+    
+    # Tombol untuk mengirim form
+    submit_button = st.form_submit_button("Predict Behavior")
+
+    cluster_behaviors = {
+    0: "Pelanggan dengan Pengeluaran Biasa",
+    1: "Pelanggan dengan Pengeluaran Tinggi",
+    2: "Pelanggan dengan Pengeluaran Hemat"
+}
+    
+    if submit_button:
+        # Mempersiapkan data input dan melakukan scaling
+        input_df = pd.DataFrame([input_data])
+        input_scaled = scaler.transform(input_df)  # Skalakan data input menggunakan scaler yang sudah dilatih
+        
+        # Prediksi cluster
+        cluster = kmeans.predict(input_scaled)[0]  # Prediksi cluster untuk data input
+        behavior = cluster_behaviors.get(cluster, "Unknown")  # Menentukan perilaku berdasarkan cluster
+        
+        # Menampilkan hasil prediksi
+        st.success(f"Customer Segment: {behavior} (Cluster {cluster})")
+        
+        # Membandingkan dengan rata-rata cluster
+        st.write("#### Comparison with Cluster Averages")
+        comparison_df = pd.DataFrame({
+            'Input Values': input_data,
+            'Cluster Average': df[df['Cluster'] == cluster][variables].mean()
+        }).round(2)
+        
+        st.write(comparison_df)
+
 
 """# 🛒**8.Analisis Clustering Berdasarkan Spending Behavior**🕵️‍♀️
 
