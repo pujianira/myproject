@@ -452,42 +452,35 @@ st.write(f"Jumlah cluster optimal: {optimal_k}")
 
 # K-Means clustering
 kmeans = KMeans(n_clusters=optimal_k, random_state=42)
-kmeans.fit(df_scaled)
-cluster_labels = kmeans.labels_
+df['Cluster'] = kmeans.fit_predict(df_scaled)
 
 # Menampilkan pusat cluster (centroid)
 st.write("\nPusat cluster (centroid):")
 st.write(kmeans.cluster_centers_)
 
 # Menampilkan jumlah data di masing-masing cluster
-print("\nJumlah data di setiap cluster:")
-print(df['Cluster'].value_counts())
+st.write("\nJumlah data di setiap cluster:")
+st.write(df['Cluster'].value_counts())
 
 # Statistik deskriptif untuk setiap cluster
-print("\nStatistik deskriptif untuk setiap cluster:")
-print(df.groupby('Cluster').mean())
+st.write("\nStatistik deskriptif untuk setiap cluster:")
+st.write(df.groupby('Cluster').mean())
 
 # Visualisasi hasil clustering (2D projection menggunakan PCA jika data >2D)
 pca = PCA(n_components=2)
 X_pca = pca.fit_transform(df_scaled)
-plt.figure(figsize=(10, 8))
-sns.scatterplot(x=pca_data['PC1'], y=pca_data['PC2'], hue=cluster_labels, palette='viridis')
-plt.title('Cluster Visualization (PCA)')
-plt.xlabel('Principal Component 1')
-plt.ylabel('Principal Component 2')
-plt.legend(title='Cluster')
-plt.grid()
-plt.show()
 
 # Plot hasil clustering
-plt.figure(figsize=(8, 6))
-sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=df['Cluster'], palette='rainbow', s=50)
-plt.title('K-Means Clustering Visualization')
-plt.xlabel('Economical Factors')
-plt.ylabel('Behavioral Factors')
-plt.legend(title='Cluster')
-plt.grid()
-plt.show()
+fig, ax = plt.subplots(figsize=(8, 6))
+sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=df['Cluster'], palette='rainbow', s=50, ax=ax)
+ax.set_title('K-Means Clustering Visualization')
+ax.set_xlabel('Economical Factors')
+ax.set_ylabel('Behavioral Factors')
+ax.legend(title='Cluster')
+ax.grid()
+
+# Menampilkan plot di Streamlit
+st.pyplot(fig)
 
 """# 🛒**8.Analisis Clustering Berdasarkan Spending Behavior**🕵️‍♀️
 
