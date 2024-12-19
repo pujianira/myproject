@@ -67,9 +67,6 @@ numerical_columns = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Pur
 # Daftar variabel yang ingin diplot
 variables = ['Age', 'Income', 'Spending_Score', 'Membership_Years', 'Purchase_Frequency', 'Last_Purchase_Amount']
 
-# **a. Visualisasi distribusi data menggunakan histogram**
-st.subheader("a. Visualisasi distribusi data menggunakan histogram")
-
 # Cek apakah kolom-kolom ada di dalam DataFrame
 for var in variables:
     if var in df.columns:
@@ -121,9 +118,9 @@ sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt='.4f', linewidt
 ax.set_title('Matriks Korelasi antar Variabel')
 st.pyplot(fig)
 
-# Memeriksa kolom yang hilang
-missing_columns = [col for col in numerical_columns if col not in df_scaled.columns]
-st.write("Kolom yang hilang:", missing_columns)
+# # Memeriksa kolom yang hilang
+# missing_columns = [col for col in numerical_columns if col not in df_scaled.columns]
+# st.write("Kolom yang hilang:", missing_columns)
 
 
 """# **3. Analisis Korelasi Antarfitur dalam Dataset**
@@ -211,12 +208,7 @@ plt.tight_layout()
 # Menampilkan plot di Streamlit
 st.pyplot(fig)
 
-"""# 🧩**5. Principal Component Analysis (PCA)**🤖"""
-
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.decomposition import PCA
+"""# 🧩5. Principal Component Analysis (PCA)"""
 
 # Fungsi untuk menganalisis korelasi antar fitur
 def analyze_correlations(correlation_matrix, threshold=0.7):
@@ -302,7 +294,7 @@ for i, row in components_df.iterrows():
     # Filter fitur dengan kontribusi signifikan (threshold 0.2)
     contributing_features = row.index[row.abs() > 0.2]
     # Menampilkan nama kolom
-    print(", ".join(contributing_features))  # Gabungkan nama kolom dengan koma
+    print(", ".join(contributing_features))  
     print()
 
 """**Analisis:**
@@ -352,8 +344,8 @@ Grafik elbow biasanya menunjukkan titik di mana penurunan inertia mulai melambat
 
 **Dari hasil ini:**
 
-Inertia menurun tajam dari k=2 ke k=3 dan mulai melambat setelah k=3.
-Penurunan inertia setelah k=3 menjadi lebih kecil, sehingga k=3 dapat dianggap titik elbow.
+Inertia menurun tajam dari k=2 ke k=5 dan mulai melambat setelah k=5.
+Penurunan inertia setelah k=5 menjadi lebih kecil, sehingga k=5 dapat dianggap titik elbow.
 
 **b. Silhouette Score**
 """
@@ -380,13 +372,7 @@ ax.set_xlabel('Number of Clusters (k)')
 ax.set_ylabel('Silhouette Score')
 ax.set_xticks(k_values)
 ax.grid(True)
-
-# Menampilkan plot di Streamlit
 st.pyplot(fig)
-
-# Menentukan k optimal
-optimal_k = k_values[np.argmax(silhouette_scores)]
-st.write(f'Optimal number of clusters based on silhouette score: {optimal_k}')
 
 """**Analisis:**
 
@@ -394,19 +380,18 @@ Nilai silhouette score menunjukkan kualitas clustering, di mana nilai mendekati 
 
 **Dari hasil ini:**
 
-Nilai silhouette score tertinggi adalah pada k=2 (0.6005).
-Setelah k=2, silhouette score menurun tetapi tetap relatif stabil di sekitar 0.53–0.57.
+Nilai silhouette score tertinggi adalah pada k=2 dan tertinggi kedua pada k=5..
 Meski k=2 memiliki nilai tertinggi, memilih k=2 mungkin terlalu sederhana untuk dataset yang kompleks.
 
 # **Kesimpulan:**
 
-k=3 adalah pilihan yang lebih baik karena memiliki keseimbangan antara penurunan inertia (dari Elbow Method) dan silhouette score yang masih cukup baik (0.5728).
+k=5 adalah pilihan yang lebih baik karena memiliki keseimbangan antara penurunan inertia (dari Elbow Method) dan silhouette score yang masih cukup baik.
 
 # 🖥️**7. K-Means Clustering & Visualisasi**👩‍💻
 """
 
 # Jumlah cluster yang ditentukan
-optimal_k = 3
+optimal_k = 5
 st.write(f"Jumlah cluster optimal: {optimal_k}")
 
 # K-Means clustering
@@ -439,85 +424,110 @@ ax.legend(title='Cluster')
 ax.grid()
 st.pyplot(fig)
 
-"""# 🛒**8.Analisis Clustering Berdasarkan Spending Behavior**🕵️‍♀️
+"""# 🛒**8. Analisis Clustering Berdasarkan Spending Behavior**🕵️‍♀️
 
-# 🎲**1.Cluster 0: Pelanggan dengan Pengeluaran Tinggi**
+## 🎲**1.Cluster 0: Pelanggan Diamond**
 
-Rata-rata Usia: 56.42 tahun
+* Rata-rata Usia: 54.7 tahun
+* Rata-rata Pendapatan: 59,897.42
+* Rata-rata Skor Pengeluaran: 12,083.12
+* Rata-rata Keanggotaan: 15.18 tahun
+* Rata-rata Frekuensi Pembelian: 77.5613
+* Rata-rata Jumlah Pembelian Terakhir: 6,090.75
 
-Rata-rata Pendapatan: 61,747.57
+### 🛒Karakteristik:
 
-Rata-rata Skor Pengeluaran: 12,452.62
-
-Rata-rata Keanggotaan: 10.14 tahun
-
-Rata-rata Frekuensi Pembelian: 52.63
-
-Rata-rata Jumlah Pembelian Terakhir: 6,276.82
-
-# 🛒Karakteristik:
-
-* Pelanggan ini cenderung lebih tua (rata-rata 56 tahun) dengan pendapatan yang lebih tinggi (rata-rata 61,747).
+* Pelanggan ini berumur tua, memiliki pendapatan tinggi, pengeluaran besar, dan sangat loyal dengan masa keanggotaan yang panjang.
 * Mereka memiliki skor pengeluaran yang sangat tinggi, menunjukkan bahwa mereka cenderung berbelanja lebih banyak.
-* Mereka juga lebih lama menjadi anggota perusahaan (rata-rata keanggotaan 10 tahun) dan melakukan pembelian lebih sering (52.63 kali).
-* Dengan jumlah pembelian terakhir yang tinggi (6,276.82), mereka bisa dikategorikan sebagai Pelanggan dengan Pengeluaran Tinggi.
+* Mereka juga lebih lama menjadi anggota perusahaan dan sering melakukan pembelian dengan nilai transaksi yang tinggi.
+* Dengan jumlah pembelian terakhir yang tinggi (6,090.75), mereka bisa dikategorikan sebagai Pelanggan Diamond dengan pengeluaran tinggi.
 
-# 🪄Strategi Marketing:
+### 🪄Strategi Marketing:
 
-Perusahaan dapat menawarkan produk premium atau eksklusif kepada kelompok ini, serta memberikan layanan pelanggan khusus dan diskon besar untuk pembelian jumlah besar. Pelanggan ini sangat potensial untuk penjualan besar-besaran dan loyalitas jangka panjang.
+* Perusahaan dapat menawarkan produk premium atau eksklusif kepada kelompok ini, serta memberikan layanan pelanggan khusus dan diskon besar untuk pembelian jumlah besar. 
+* Memberikan program hadiah untuk setiap pembelian besar, seperti akses ke event spesial.
+* Fokus pada produk premium dengan layanan eksklusif seperti akses prioritas atau program penghargaan.
 
-# 🎲**2.Cluster 1: Pelanggan dengan Pengeluaran Hemat**
+## 🎲**2.Cluster 1: Pelanggan Gold**
 
-Rata-rata Usia: 27.02 tahun
+* Rata-rata Usia: 42.29 tahun
+* Rata-rata Pendapatan: 47,288.22
+* Rata-rata Skor Pengeluaran: 9,558.104
+* Rata-rata Keanggotaan: 5.5 tahun
+* Rata-rata Frekuensi Pembelian: 29.58
+* Rata-rata Jumlah Pembelian Terakhir: 4,825.58
 
-Rata-rata Pendapatan: 31,820.48
+### 🛒Karakteristik:
 
-Rata-rata Skor Pengeluaran: 6,465.77
-
-Rata-rata Keanggotaan: 8.18 tahun
-
-Rata-rata Frekuensi Pembelian: 42.90
-
-Rata-rata Jumlah Pembelian Terakhir: 3,281.03
-
-# 🛒Karakteristik:
-
-* Pelanggan ini lebih muda (rata-rata 27 tahun) dengan pendapatan yang lebih rendah dibandingkan dengan Cluster 0 (rata-rata 31,820).
-* Mereka memiliki skor pengeluaran yang lebih rendah (rata-rata 6,465), dan frekuensi pembelian mereka juga lebih rendah (42.90 kali).
-* Jumlah pembelian terakhir mereka juga relatif lebih rendah (3,281.03), yang menunjukkan kebiasaan belanja yang lebih moderat.
+* Pelanggan ini termasuk di usia pertengahan dibanding cluster lainnya dengan pendapatan yang berada di pertengahan juga.
+* Mereka memiliki skor pengeluaran yang cukup tinggi, dan frekuensi pembelian mereka juga lebih rendah (29.58 kali).
+* Jumlah pembelian terakhir mereka juga relatif lebih rendah, yang menunjukkan kebiasaan belanja yang lebih moderat.
 * Mereka lebih cenderung dapat dikategorikan sebagai Pelanggan Biasa, yang tidak berbelanja terlalu banyak, namun masih aktif.
 
-# 🪄Strategi Marketing:
+### 🪄Strategi Marketing:
 
-Strategi pemasaran dapat mencakup penawaran produk dengan harga menengah dan paket diskon yang menekankan efisiensi atau nilai. Selain itu, perusahaan dapat menawarkan berbagai pilihan pembayaran atau program loyalitas untuk meningkatkan pembelian berulang.
+* Strategi pemasaran dapat mencakup penawaran produk dengan harga menengah dan paket diskon yang menekankan efisiensi atau nilai. 
+* Perusahaan dapat menawarkan berbagai pilihan pembayaran atau program loyalitas untuk meningkatkan pembelian berulang.
 
-# 🎲**3.Cluster 1: Pelanggan dengan Pengeluaran Biasa**
+## 🎲**3.Cluster 2: Pelanggan Classic**
 
-Rata-rata Usia: 41.69 tahun
+* Rata-rata Usia: 25.34 tahun
+* Rata-rata Pendapatan: 30,285.23
+* Rata-rata Skor Pengeluaran: 6,160.19
+* Rata-rata Keanggotaan: 5.56 tahun
+* Rata-rata Frekuensi Pembelian: 29.75
+* Rata-rata Jumlah Pembelian Terakhir: 3,128.85
 
-Rata-rata Pendapatan: 46,681.01
+### 🛒Karakteristik:
 
-Rata-rata Skor Pengeluaran: 9,437.15
-
-Rata-rata Keanggotaan: 9.84 tahun
-
-Rata-rata Frekuensi Pembelian: 51.23
-
-Rata-rata Jumlah Pembelian Terakhir: 4,766.68
-
-# 🛒Karakteristik:
-
-* Pelanggan ini berada di usia rata-rata sekitar 41 tahun dengan pendapatan yang lebih tinggi (rata-rata 46,681).
-* Skor pengeluaran mereka juga moderat (9,437), meskipun lebih tinggi dibandingkan dengan Cluster 1.
-* Mereka memiliki frekuensi pembelian yang cukup tinggi (51.23 kali) dan jumlah pembelian terakhir yang relatif tinggi (4,766.68).
+* Pelanggan ini berada di usia rata-rata sekitar 25 tahun dengan pendapatan yang paling rendah.
+* Mereka memiliki frekuensi pembelian yang cukup tinggi (29.75 kali) dan jumlah pembelian terakhir yang lumayan tinggi.
 * Mereka dapat dianggap sebagai Pelanggan Hemat, yang mungkin berbelanja lebih sering tetapi tidak menghabiskan terlalu banyak dalam setiap transaksi.
 
-# 🪄Strategi Marketing:
+### 🪄Strategi Marketing:
 
 Kelompok ini memerlukan insentif yang lebih kecil namun menarik, seperti diskon atau promosi untuk mendorong frekuensi pembelian mereka. Perusahaan dapat fokus pada peningkatan pengalaman berbelanja agar pelanggan ini lebih sering membeli.
+
+## 🎲 **3. Cluster 3: Pelanggan Platinum**
+
+* Rata-rata Usia: 57.14 tahun
+* Rata-rata Pendapatan: 62,490.30
+* Rata-rata Skor Pengeluaran: 12,599.90
+* Rata-rata Keanggotaan: 5.59 tahun
+* Rata-rata Frekuensi Pembelian: 29.91
+* Rata-rata Jumlah Pembelian Terakhir: 6,352.25
+
+### 🛒 Karakteristik:
+* Pelanggan ini merupakan kelompok usia yang paling tua, dengan pendapatan yang sangat tinggi.
+* Mereka memiliki skor pengeluaran yang sangat tinggi, hampir mendekati Platinum.
+* Meskipun masa keanggotaan mereka relatif singkat, mereka memiliki jumlah pembelian terakhir yang signifikan, menunjukkan daya beli yang kuat.
+* Frekuensi pembelian lebih rendah daripada pelanggan Diamond, namun mereka tetap memiliki nilai transaksi yang tinggi.
+
+### 🪄 Strategi Marketing:
+* Buat promosi untuk menjaga mereka tetap loyal, meski masa keanggotaan mereka cenderung lebih singkat.
+* Memberikan program langganan bulanan.
+
+## 🎲 **4. Cluster 4: Pelanggan Silver**
+
+* Rata-rata Usia: 36.14 tahun
+* Rata-rata Pendapatan: 41,057.98
+* Rata-rata Skor Pengeluaran: 8,312.29
+* Rata-rata Keanggotaan: 14.71 tahun
+* Rata-rata Frekuensi Pembelian: 75.58
+* Rata-rata Jumlah Pembelian Terakhir: 4,204.85
+
+### 🛒 Karakteristik:
+* Pelanggan ini relatif lebih muda dibandingkan kelompok lainnya, dengan pendapatan menengah.
+* Skor pengeluaran mereka berada di tingkat moderat, dengan keanggotaan yang cukup lama.
+* Mereka sering melakukan pembelian (frekuensi tinggi), namun dengan jumlah pembelian terakhir yang lebih rendah dibandingkan Cluster Diamond atau Platinum.
+
+### 🪄 Strategi Marketing:
+* Berikan promosi berbasis frekuensi pembelian, seperti penawaran "beli sekian, gratis satu".
+* Tawarkan program loyalitas untuk mempertahankan mereka karena masa keanggotaan mereka sudah panjang.
+* Dorong pembelian yang lebih besar dengan insentif seperti diskon untuk pembelian jumlah banyak.
 """
 # Prediction Interface
-st.subheader("5.2 Predict New Customer Behavior")
+st.subheader("Predict Customer Behavior")
 
 # Form untuk input data baru
 with st.form("prediction_form"):
@@ -537,19 +547,20 @@ with st.form("prediction_form"):
     submit_button = st.form_submit_button("Predict Behavior")
 
     cluster_behaviors = {
-    0: "Pelanggan dengan Pengeluaran Biasa",
-    1: "Pelanggan dengan Pengeluaran Tinggi",
-    2: "Pelanggan dengan Pengeluaran Hemat"
+    0: "Pelanggan Diamond",
+    1: "Pelanggan Gold",
+    2: "Pelanggan Classic",
+    3: "Pelanggan Platium",
+    4: "Pelanggan Silver"
 }
     
     if submit_button:
-        # Mempersiapkan data input dan melakukan scaling
         input_df = pd.DataFrame([input_data])
-        input_scaled = scaler.transform(input_df)  # Skalakan data input menggunakan scaler yang sudah dilatih
+        input_scaled = scaler.transform(input_df) 
         
         # Prediksi cluster
-        cluster = kmeans.predict(input_scaled)[0]  # Prediksi cluster untuk data input
-        behavior = cluster_behaviors.get(cluster, "Unknown")  # Menentukan perilaku berdasarkan cluster
+        cluster = kmeans.predict(input_scaled)[0]  
+        behavior = cluster_behaviors.get(cluster, "Unknown")  
         
         # Menampilkan hasil prediksi
         st.success(f"Customer Segment: {behavior} (Cluster {cluster})")
