@@ -2,7 +2,7 @@ import streamlit as st
 st.markdown("""
 # **Customer Behavior Segmentation Analysis** 
 
-# 👯‍♀️ **Anggota Kelompok:** 👯‍♀️
+# **Anggota Kelompok:**
 1️⃣ Pujiani Rahayu Agustin - 24060122130067
 
 2️⃣ Meyta Rizki Khairunisa - 24060122130085
@@ -14,23 +14,8 @@ st.markdown("""
 # ‼️**Identifikasi Masalah**⁉️
 Sebuah perusahaan retail menyadari bahwa pelanggan mereka memiliki kebiasaan belanja yang beragam, sehingga perlu membuat strategi pemasaran yang lebih spesifik menyasar pelanggan dengan masing-masing kebiasan mereka. Perusahaan ingin membagi pelanggannya menjadi tiga kategori, yaitu **pelanggan hemat, pelanggan biasa, dan pelanggan dengan pengeluaran tinggi.** Masing-masing kategori nantinya akan diberikan strategi pemasaran yang sesuai.
 
-Dengan menggunakan dataset yang ada, kami menganalisis data dari berbagai kriteria, seperti usia dan pendapatan pelanggan, skor pengeluaran mereka, keanggotaan mereka, frekuensi pembelian dan jumlah pembelian terakhir mereka untuk menentukan clustering menjadi tiga kategori pelanggan.
-
-# 📚 **Library yang Diperlukan**
-import streamlit as st
-import pandas as pd
-import numpy as np
-from sklearn.preprocessing import StandardScaler
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.cluster import KMeans
-from sklearn.decomposition import PCA
-import matplotlib.pyplot as plt
-import seaborn as sns
-from sklearn.metrics import silhouette_score
-import io           
+Dengan menggunakan dataset yang ada, kami menganalisis data dari berbagai kriteria, seperti usia dan pendapatan pelanggan, skor pengeluaran mereka, keanggotaan mereka, frekuensi pembelian dan jumlah pembelian terakhir mereka untuk menentukan clustering menjadi tiga kategori pelanggan.          
 """)
-
-import streamlit as st
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler
@@ -128,9 +113,6 @@ df_scaled = pd.DataFrame(scaler.fit_transform(df_cleaned[numerical_columns]), co
 
 # Matriks korelasi
 correlation_matrix = df_scaled.corr()
-
-# Menampilkan matriks korelasi dengan lebih banyak desimal
-st.write("=== Matriks Korelasi ===")
 st.write(correlation_matrix.round(4))  # Membulatkan ke 4 desimal
 
 # Visualisasi dengan lebih banyak desimal
@@ -580,4 +562,3 @@ with st.form("prediction_form"):
         }).round(2)
         
         st.write(comparison_df)
-
